@@ -138,8 +138,8 @@ class DatabaseManager:
                     columns.append({
                         "name": column['name'],
                         "type": str(column['type']),
-                        "nullable": column.get('nullable', True),
-                        "primary_key": column.get('primary_key', False)
+                        "nullable": str(column.get('nullable', True)).lower(),
+                        "primary_key": str(column.get('primary_key', False)).lower()
                     })
                 
                 # Get sample data
