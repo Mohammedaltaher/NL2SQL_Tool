@@ -4,6 +4,14 @@ This tool allows users to input natural language questions and get the equivalen
 
 ---
 
+## 🖼️ Screenshots
+
+| Home Page | Example Query | SQL Output | Query Results |
+|-----------|--------------|------------|---------------|
+| ![Home](image/image1.png) | ![Example Query](image/image2.png) | ![SQL Output](image/image3.png) | ![Query Results](image/image4.png) |
+
+---
+
 ## 🚀 Features
 
 - Converts natural language to SQL queries using LLMs (via Ollama)
