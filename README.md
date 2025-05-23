@@ -20,6 +20,9 @@ Here's a visual walkthrough of the NL2SQL Tool:
 **4. Query Results:** Presents the data retrieved from the database after executing the generated SQL query.
 ![Query Results](image/image4.png)
 
+**5. API Documentation (Swagger UI):** Interactive API documentation for testing and exploring endpoints.
+![API Documentation](image/swagger.png)
+
 ---
 
 ## 🚀 Features
