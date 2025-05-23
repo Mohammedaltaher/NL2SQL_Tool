@@ -5,6 +5,7 @@ from langchain.llms.base import LLM
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from dotenv import load_dotenv
+from .logger import logger  # Import logger
 
 load_dotenv()
 
@@ -19,9 +20,11 @@ class OllamaLLM(LLM):
         super().__init__(**kwargs)
         self.base_url = os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
         self.model = os.getenv('OLLAMA_MODEL', 'llama2')
-    
-    def _call(self, prompt: str, stop: Optional[list] = None) -> str:
+        logger.info(f"OllamaLLM initialized with base_url={self.base_url}, model={self.model}")
+
+    def _call(self, prompt: str, stop: Optional[list] = None, run_manager=None, **kwargs) -> str:
         """Call Ollama API"""
+        logger.debug(f"Calling Ollama API with prompt: {prompt}")
         try:
             response = requests.post(
                 f"{self.base_url}/api/generate",
@@ -37,16 +40,18 @@ class OllamaLLM(LLM):
                 },
                 timeout=120
             )
-            
+            logger.debug(f"Ollama API response status: {response.status_code}")
             if response.status_code == 200:
                 result = response.json()
+                logger.debug(f"Ollama API result: {result}")
                 return result.get('response', '').strip()
             else:
+                logger.error(f"Ollama API error: {response.status_code} - {response.text}")
                 raise Exception(f"Ollama API error: {response.status_code} - {response.text}")
-                
         except Exception as e:
+            logger.exception(f"Failed to call Ollama: {e}")
             raise Exception(f"Failed to call Ollama: {e}")
-    
+
     @property
     def _llm_type(self) -> str:
         return "ollama"
@@ -101,25 +106,26 @@ Provide a brief, clear explanation of what this query does:"""
     
     def generate_sql(self, question: str, schema_context: str) -> Dict[str, Any]:
         """Generate SQL from natural language question"""
+        logger.info(f"Generating SQL for question: {question}")
         try:
             # Generate SQL query
             sql_query = self.sql_chain.run(
                 schema=schema_context,
                 question=question
             )
-            
+            logger.debug(f"Raw SQL query generated: {sql_query}")
             # Clean up the SQL query
             sql_query = self._clean_sql_query(sql_query)
-            
+            logger.debug(f"Cleaned SQL query: {sql_query}")
             # Generate explanation
             explanation = self.explanation_chain.run(
                 sql_query=sql_query,
                 question=question
             )
-            
+            logger.debug(f"Explanation generated: {explanation}")
             # Calculate confidence based on query complexity and schema match
             confidence = self._calculate_confidence(sql_query, schema_context)
-            
+            logger.info(f"SQL generation successful. Confidence: {confidence}")
             return {
                 "sql_query": sql_query,
                 "explanation": explanation.strip(),
@@ -127,8 +133,8 @@ Provide a brief, clear explanation of what this query does:"""
                 "success": True,
                 "error": None
             }
-            
         except Exception as e:
+            logger.exception(f"Error generating SQL: {e}")
             return {
                 "sql_query": "",
                 "explanation": "",
@@ -183,21 +189,29 @@ Provide a brief, clear explanation of what this query does:"""
     
     def test_connection(self) -> bool:
         """Test connection to Ollama"""
+        logger.info("Testing connection to Ollama API...")
         try:
             response = requests.get(f"{self.llm.base_url}/api/tags", timeout=5)
+            logger.debug(f"Ollama test connection status: {response.status_code}")
             return response.status_code == 200
-        except Exception:
+        except Exception as e:
+            logger.exception(f"Ollama test connection failed: {e}")
             return False
     
     def get_available_models(self) -> list:
         """Get list of available models from Ollama"""
+        logger.info("Fetching available models from Ollama API...")
         try:
             response = requests.get(f"{self.llm.base_url}/api/tags", timeout=5)
             if response.status_code == 200:
                 data = response.json()
-                return [model['name'] for model in data.get('models', [])]
+                models = [model['name'] for model in data.get('models', [])]
+                logger.debug(f"Available models: {models}")
+                return models
+            logger.error(f"Failed to fetch models: {response.status_code}")
             return []
-        except Exception:
+        except Exception as e:
+            logger.exception(f"Error fetching models: {e}")
             return []
 
 
