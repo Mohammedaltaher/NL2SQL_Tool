@@ -1,0 +1,264 @@
+# 🧠 NL2SQL Tool – Natural Language to SQL using LangChain, Ollama, and FastAPI
+
+This tool allows users to input natural language questions and get the equivalent SQL query along with the query result from a registered database schema.
+
+---
+
+## 🚀 Features
+
+- Converts natural language to SQL queries using LLMs (via Ollama)
+- Runs SQL queries on your database
+- API-first tool built with FastAPI
+- Powered by LangChain for LLM chaining and prompt logic
+- Support for multiple database types (SQLite, PostgreSQL, MySQL)
+- Interactive web interface
+- Schema auto-discovery and documentation
+
+---
+
+## 📋 Prerequisites
+
+Before starting, ensure you have the following installed:
+
+1. **Python 3.8+**
+2. **Ollama** - For running local LLMs
+3. **Git** (optional, for version control)
+
+---
+
+## 🛠️ Step-by-Step Installation Guide
+
+### Step 1: Install Ollama
+
+1. **Download and Install Ollama:**
+   - Visit [https://ollama.ai](https://ollama.ai)
+   - Download the installer for your OS
+   - Run the installer
+
+2. **Pull a Language Model:**
+   ```powershell
+   ollama pull llama2
+   # or use a more capable model like:
+   # ollama pull codellama
+   # ollama pull llama2:13b
+   ```
+
+3. **Verify Ollama Installation:**
+   ```powershell
+   ollama list
+   ```
+
+### Step 2: Set Up Python Environment
+
+1. **Navigate to Project Directory:**
+   ```powershell
+   cd c:\Users\DMA\source\repos\NL2SQL_Tool
+   ```
+
+2. **Create Virtual Environment:**
+   ```powershell
+   python -m venv venv
+   ```
+
+3. **Activate Virtual Environment:**
+   ```powershell
+   .\venv\Scripts\Activate.ps1
+   ```
+   
+   If you get execution policy errors, run:
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   ```
+
+4. **Install Required Packages:**
+   ```powershell
+   pip install -r requirements.txt
+   ```
+
+### Step 3: Database Setup
+
+1. **Choose Your Database Option:**
+   
+   **Option A: SQLite (Recommended for testing)**
+   - The tool comes with a sample SQLite database
+   - No additional setup required
+   
+   **Option B: PostgreSQL**
+   ```powershell
+   # Install PostgreSQL driver
+   pip install psycopg2-binary
+   ```
+   
+   **Option C: MySQL**
+   ```powershell
+   # Install MySQL driver
+   pip install pymysql
+   ```
+
+2. **Configure Database Connection:**
+   - Copy `.env.example` to `.env`
+   - Edit `.env` with your database credentials
+
+### Step 4: Run the Application
+
+1. **Start Ollama Service:**
+   ```powershell
+   ollama serve
+   ```
+   Keep this terminal open.
+
+2. **Start the NL2SQL API (in new terminal):**
+   ```powershell
+   cd c:\Users\DMA\source\repos\NL2SQL_Tool
+   .\venv\Scripts\Activate.ps1
+   python main.py
+   ```
+
+3. **Access the Application:**
+   - API Documentation: http://localhost:8000/docs
+   - Web Interface: http://localhost:8000
+   - Health Check: http://localhost:8000/health
+
+---
+
+## 🎯 Usage Examples
+
+### API Usage
+
+1. **Convert Natural Language to SQL:**
+   ```powershell
+   curl -X POST "http://localhost:8000/nl2sql" -H "Content-Type: application/json" -d "{\"question\": \"Show me all customers from New York\"}"
+   ```
+
+2. **Execute Query and Get Results:**
+   ```powershell
+   curl -X POST "http://localhost:8000/query" -H "Content-Type: application/json" -d "{\"question\": \"How many orders were placed last month?\"}"
+   ```
+
+### Web Interface Usage
+
+1. Open http://localhost:8000 in your browser
+2. Enter your natural language question
+3. View the generated SQL and results
+
+---
+
+## 📁 Project Structure
+
+```
+NL2SQL_Tool/
+│
+├── app/
+│   ├── __init__.py
+│   ├── main.py              # FastAPI application
+│   ├── models.py            # Pydantic models
+│   ├── database.py          # Database connection and operations
+│   ├── llm_service.py       # LangChain + Ollama integration
+│   └── utils.py             # Utility functions
+│
+├── static/
+│   ├── css/
+│   │   └── style.css        # Web interface styling
+│   └── js/
+│       └── main.js          # Frontend JavaScript
+│
+├── templates/
+│   └── index.html           # Web interface template
+│
+├── data/
+│   └── sample.db            # Sample SQLite database
+│
+├── requirements.txt         # Python dependencies
+├── .env.example            # Environment variables template
+├── .gitignore              # Git ignore file
+└── README.md               # This file
+```
+
+---
+
+## 🔧 Configuration
+
+### Environment Variables (.env)
+
+```env
+# Database Configuration
+DATABASE_TYPE=sqlite
+DATABASE_URL=sqlite:///./data/sample.db
+
+# For PostgreSQL:
+# DATABASE_TYPE=postgresql
+# DATABASE_URL=postgresql://username:password@localhost:5432/dbname
+
+# For MySQL:
+# DATABASE_TYPE=mysql
+# DATABASE_URL=mysql+pymysql://username:password@localhost:3306/dbname
+
+# Ollama Configuration
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=llama2
+
+# API Configuration
+API_HOST=0.0.0.0
+API_PORT=8000
+```
+
+---
+
+## 🧪 Testing
+
+1. **Run Unit Tests:**
+   ```powershell
+   python -m pytest tests/
+   ```
+
+2. **Test API Endpoints:**
+   ```powershell
+   python tests/test_api.py
+   ```
+
+---
+
+## 🐛 Troubleshooting
+
+### Common Issues:
+
+1. **Ollama Connection Error:**
+   - Ensure Ollama is running: `ollama serve`
+   - Check if model is installed: `ollama list`
+
+2. **Database Connection Error:**
+   - Verify database credentials in `.env`
+   - Ensure database server is running
+
+3. **Python Import Errors:**
+   - Activate virtual environment
+   - Install requirements: `pip install -r requirements.txt`
+
+4. **PowerShell Execution Policy:**
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   ```
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- [LangChain](https://langchain.com/) - For LLM integration
+- [Ollama](https://ollama.ai/) - For local LLM hosting
+- [FastAPI](https://fastapi.tiangolo.com/) - For the web framework

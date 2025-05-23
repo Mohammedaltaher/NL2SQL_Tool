@@ -1,0 +1,20 @@
+fastapi
+uvicorn
+langchain   
+langchain-community
+sqlalchemy
+python-multipart
+jinja2
+python-dotenv
+pydantic
+requests
+
+# Optional database drivers
+# Uncomment based on your database choice:
+# psycopg2-binary==2.9.9  # PostgreSQL
+# pymysql==1.1.0          # MySQL
+
+# Development dependencies
+pytest
+httpx
+

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NL2SQL Tool - Natural Language to SQL</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 NL2SQL Tool</h1>
+            <p>Convert natural language questions to SQL queries using AI</p>
+        </header>
+
+        <main>
+            <!-- Status indicators -->
+            <div class="status-bar">
+                <div class="status-item" id="db-status">
+                    <span class="status-icon">🔗</span>
+                    <span class="status-text">Database: <span id="db-status-text">Checking...</span></span>
+                </div>
+                <div class="status-item" id="ollama-status">
+                    <span class="status-icon">🤖</span>
+                    <span class="status-text">AI Model: <span id="ollama-status-text">Checking...</span></span>
+                </div>
+            </div>
+
+            <!-- Input section -->
+            <section class="input-section">
+                <div class="input-group">
+                    <label for="question">Ask a question about your data:</label>
+                    <textarea 
+                        id="question" 
+                        placeholder="e.g., Show me all customers from New York who placed orders last month"
+                        rows="3"
+                    ></textarea>
+                </div>
+                
+                <div class="button-group">
+                    <button id="generate-sql-btn" class="btn btn-primary">
+                        Generate SQL Only
+                    </button>
+                    <button id="execute-query-btn" class="btn btn-success">
+                        Generate & Execute
+                    </button>
+                    <button id="view-schema-btn" class="btn btn-secondary">
+                        View Schema
+                    </button>
+                </div>
+            </section>
+
+            <!-- Loading indicator -->
+            <div id="loading" class="loading hidden">
+                <div class="spinner"></div>
+                <p>Processing your request...</p>
+            </div>
+
+            <!-- Results section -->
+            <section class="results-section">
+                <!-- SQL Query Display -->
+                <div id="sql-result" class="result-card hidden">
+                    <h3>Generated SQL Query</h3>
+                    <div class="sql-container">
+                        <pre><code id="sql-code" class="language-sql"></code></pre>
+                        <button id="copy-sql-btn" class="btn btn-small">Copy SQL</button>
+                    </div>
+                    <div id="sql-explanation" class="explanation"></div>
+                    <div id="sql-confidence" class="confidence"></div>
+                </div>
+
+                <!-- Query Results Display -->
+                <div id="query-result" class="result-card hidden">
+                    <h3>Query Results</h3>
+                    <div id="result-summary" class="result-summary"></div>
+                    <div id="result-table-container">
+                        <table id="result-table" class="result-table">
+                            <thead></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Schema Display -->
+                <div id="schema-result" class="result-card hidden">
+                    <h3>Database Schema</h3>
+                    <div id="schema-content"></div>
+                </div>
+
+                <!-- Error Display -->
+                <div id="error-result" class="result-card error hidden">
+                    <h3>Error</h3>
+                    <div id="error-message"></div>
+                </div>
+            </section>
+
+            <!-- Example queries -->
+            <section class="examples-section">
+                <h3>Example Questions</h3>
+                <div class="examples-grid">
+                    <div class="example-card" data-question="Show me all customers from New York">
+                        <h4>Customer Query</h4>
+                        <p>Show me all customers from New York</p>
+                    </div>
+                    <div class="example-card" data-question="How many orders were placed in the last month?">
+                        <h4>Count Query</h4>
+                        <p>How many orders were placed in the last month?</p>
+                    </div>
+                    <div class="example-card" data-question="What are the top 5 most expensive products?">
+                        <h4>Top Products</h4>
+                        <p>What are the top 5 most expensive products?</p>
+                    </div>
+                    <div class="example-card" data-question="Show me customers and their total order amounts">
+                        <h4>Join Query</h4>
+                        <p>Show me customers and their total order amounts</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Powered by LangChain, Ollama, and FastAPI</p>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

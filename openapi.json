@@ -1,0 +1,457 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+        "title": "NL2SQL Tool API",
+        "description": "API for converting natural language to SQL queries using LangChain and Ollama",
+        "version": "1.0.0",
+        "contact": {
+            "name": "NL2SQL Tool Team"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        }
+    },
+    "paths": {
+        "/": {
+            "get": {
+                "summary": "Root",
+                "description": "Serve the main web interface",
+                "operationId": "root__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "text/html": {}
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "summary": "Health Check",
+                "description": "Health check endpoint",
+                "operationId": "health_check_health_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HealthResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/schema": {
+            "get": {
+                "summary": "Get Database Schema",
+                "description": "Get database schema information",
+                "operationId": "get_database_schema_schema_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DatabaseSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/nl2sql": {
+            "post": {
+                "summary": "Convert NL to SQL",
+                "description": "Convert natural language to SQL query",
+                "operationId": "convert_nl_to_sql_nl2sql_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NL2SQLRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NL2SQLResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/query": {
+            "post": {
+                "summary": "Execute Query",
+                "description": "Execute natural language query and return results",
+                "operationId": "execute_query_query_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QueryRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QueryResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/execute-sql": {
+            "post": {
+                "summary": "Execute SQL Directly",
+                "description": "Execute SQL query directly (for advanced users)",
+                "operationId": "execute_sql_directly_execute_sql_post",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Sql Query",
+                            "type": "string"
+                        },
+                        "name": "sql_query",
+                        "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": {
+                            "title": "Limit",
+                            "type": "integer",
+                            "default": 100
+                        },
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/models": {
+            "get": {
+                "summary": "Get Available Models",
+                "description": "Get available Ollama models",
+                "operationId": "get_available_models_models_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "DatabaseSchema": {
+                "title": "DatabaseSchema",
+                "description": "Complete database schema model",
+                "required": [
+                    "tables",
+                    "total_tables"
+                ],
+                "type": "object",
+                "properties": {
+                    "tables": {
+                        "title": "Tables",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SchemaInfo"
+                        }
+                    },
+                    "total_tables": {
+                        "title": "Total Tables",
+                        "type": "integer"
+                    }
+                }
+            },
+            "HealthResponse": {
+                "title": "HealthResponse",
+                "description": "Health check response",
+                "required": [
+                    "status",
+                    "database_connected",
+                    "ollama_connected",
+                    "timestamp"
+                ],
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "title": "Status",
+                        "type": "string"
+                    },
+                    "database_connected": {
+                        "title": "Database Connected",
+                        "type": "boolean"
+                    },
+                    "ollama_connected": {
+                        "title": "Ollama Connected",
+                        "type": "boolean"
+                    },
+                    "timestamp": {
+                        "title": "Timestamp",
+                        "type": "string"
+                    }
+                }
+            },
+            "HTTPValidationError": {
+                "title": "HTTPValidationError",
+                "type": "object",
+                "properties": {
+                    "detail": {
+                        "title": "Detail",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        }
+                    }
+                }
+            },
+            "NL2SQLRequest": {
+                "title": "NL2SQLRequest",
+                "description": "Request model for natural language to SQL conversion",
+                "required": [
+                    "question"
+                ],
+                "type": "object",
+                "properties": {
+                    "question": {
+                        "title": "Question",
+                        "type": "string"
+                    },
+                    "schema_context": {
+                        "title": "Schema Context",
+                        "type": "string"
+                    }
+                }
+            },
+            "NL2SQLResponse": {
+                "title": "NL2SQLResponse",
+                "description": "Response model for natural language to SQL conversion",
+                "required": [
+                    "question",
+                    "sql_query"
+                ],
+                "type": "object",
+                "properties": {
+                    "question": {
+                        "title": "Question",
+                        "type": "string"
+                    },
+                    "sql_query": {
+                        "title": "Sql Query",
+                        "type": "string"
+                    },
+                    "explanation": {
+                        "title": "Explanation",
+                        "type": "string"
+                    },
+                    "confidence": {
+                        "title": "Confidence",
+                        "type": "number"
+                    }
+                }
+            },
+            "QueryRequest": {
+                "title": "QueryRequest",
+                "description": "Request model for executing queries",
+                "required": [
+                    "question"
+                ],
+                "type": "object",
+                "properties": {
+                    "question": {
+                        "title": "Question",
+                        "type": "string"
+                    },
+                    "schema_context": {
+                        "title": "Schema Context",
+                        "type": "string"
+                    },
+                    "limit": {
+                        "title": "Limit",
+                        "type": "integer",
+                        "default": 100
+                    }
+                }
+            },
+            "QueryResponse": {
+                "title": "QueryResponse",
+                "description": "Response model for query execution",
+                "required": [
+                    "question",
+                    "sql_query",
+                    "results",
+                    "row_count",
+                    "execution_time"
+                ],
+                "type": "object",
+                "properties": {
+                    "question": {
+                        "title": "Question",
+                        "type": "string"
+                    },
+                    "sql_query": {
+                        "title": "Sql Query",
+                        "type": "string"
+                    },
+                    "results": {
+                        "title": "Results",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": {}
+                        }
+                    },
+                    "row_count": {
+                        "title": "Row Count",
+                        "type": "integer"
+                    },
+                    "execution_time": {
+                        "title": "Execution Time",
+                        "type": "number"
+                    },
+                    "explanation": {
+                        "title": "Explanation",
+                        "type": "string"
+                    }
+                }
+            },
+            "SchemaInfo": {
+                "title": "SchemaInfo",
+                "description": "Model for database schema information",
+                "required": [
+                    "table_name",
+                    "columns"
+                ],
+                "type": "object",
+                "properties": {
+                    "table_name": {
+                        "title": "Table Name",
+                        "type": "string"
+                    },
+                    "columns": {
+                        "title": "Columns",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "sample_data": {
+                        "title": "Sample Data",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": {}
+                        }
+                    }
+                }
+            },
+            "ValidationError": {
+                "title": "ValidationError",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "type": "object",
+                "properties": {
+                    "loc": {
+                        "title": "Location",
+                        "type": "array",
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        }
+                    },
+                    "msg": {
+                        "title": "Message",
+                        "type": "string"
+                    },
+                    "type": {
+                        "title": "Error Type",
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}
